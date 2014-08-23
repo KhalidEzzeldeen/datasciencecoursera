@@ -1,0 +1,85 @@
+---
+title: "Practical Machine Learning Project"
+author: "Khalid Ezzeldeen"
+---
+
+### Synopsis
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, our goal will be to use data from accelerometers on the belt, forearm, arm, and dumbbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. 
+
+### Getting Data
+
+Data was obtained by attaching sensors to both study participants, and weights, to measure the motion as exercises were performed. Each participant was instructed to perform an exercise five different ways (one "correct" way and different "incorrect" ways).
+In the final data set each record consists of measurements obtained per person/exercise form in short span of time (0.5 - 2.5 seconds).
+
+```{r}
+if (!file.exists("pml-training.csv")){
+  download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv",
+                "pml-training.csv")
+}
+```
+
+### Pre-Processing
+
+Read the data with identifying null values
+
+```{r}
+pml_training = read.csv("pml-training.csv",na.strings=c("NA","","#DIV/0!"))
+dim(pml_training)
+```
+
+Remove columns that have large number of Na's
+
+```{r}
+NA_Count=function(x){sum(is.na(x))}
+NA_Columns_Count = sapply(pml_training,NA_Count)
+table(NA_Columns_Count)
+Non_NA_Cols= names(NA_Columns_Count[NA_Columns_Count==0])
+pml_training = pml_training[,Non_NA_Cols]
+```
+
+Remove metadata columns
+
+```{r}
+pml_training = pml_training[,-c(1:7)]
+dim(pml_training)
+```
+
+### Model Creation
+
+Create the model using 0.75 of the data as training and 0.25 as testing, and then use Random Forest algorithm to train the data
+
+```{r results='hide'}
+set.seed(1234)
+suppressWarnings(suppressMessages(library(caret)))
+suppressWarnings(suppressMessages(library(randomForest)))
+```
+
+```{r}
+data = pml_training
+inTrain = createDataPartition(y=data$classe,p=0.75,list=F)
+training = data[inTrain,]
+testing  = data[-inTrain,]
+# modFit = train(classe~.,data=training,method="rf")
+# saveRDS(modFit, "modFitRf.RDS")
+modFit = readRDS("modFitRf.RDS")
+```
+
+### Model Evaluation
+
+Accurcy of the model equals :
+
+```{r}
+pred = predict(modFit,testing)
+accurcy = mean(pred==testing$classe)*100
+accurcy
+```
+
+out of sample error equals :
+
+```{r}
+1 - (accurcy/100)
+```
+
+### Conclusion
+
+ Although our model is accurate and has less out of sample error but this accuracy can be decreased in real life scenario
