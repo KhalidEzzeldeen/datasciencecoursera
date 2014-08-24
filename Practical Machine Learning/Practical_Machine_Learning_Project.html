@@ -102,8 +102,8 @@ suppressWarnings(suppressMessages(library(randomForest)))</code></pre>
 inTrain = createDataPartition(y=data$classe,p=0.75,list=F)
 training = data[inTrain,]
 testing  = data[-inTrain,]
-# modFit = train(classe~.,data=training,method=&quot;rf&quot;)
-# saveRDS(modFit, &quot;modFitRf.RDS&quot;)
+modFit = train(classe~.,data=training,method=&quot;rf&quot;)
+saveRDS(modFit, &quot;modFitRf.RDS&quot;)
 modFit = readRDS(&quot;modFitRf.RDS&quot;)</code></pre>
 </div>
 <div id="model-evaluation" class="section level3">
