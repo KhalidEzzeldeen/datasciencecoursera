@@ -59,8 +59,8 @@ data = pml_training
 inTrain = createDataPartition(y=data$classe,p=0.75,list=F)
 training = data[inTrain,]
 testing  = data[-inTrain,]
-# modFit = train(classe~.,data=training,method="rf")
-# saveRDS(modFit, "modFitRf.RDS")
+modFit = train(classe~.,data=training,method="rf")
+saveRDS(modFit, "modFitRf.RDS")
 modFit = readRDS("modFitRf.RDS")
 ```
 
